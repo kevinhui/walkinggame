@@ -2,10 +2,10 @@ package com.mygdx.game.control;
 
 import com.badlogic.gdx.math.Circle;
 
-public abstract class CircleButton extends Button{
-    Circle  object;
+public abstract class EllipseButton extends Button{
+    Eclipse  object;
 
-    public CircleButton(float x, float y, String activeimg, String onclickimg, String inactiveimg) {
+    public EllipseButton(float x, float y, String activeimg, String onclickimg, String inactiveimg) {
         super(activeimg, onclickimg, inactiveimg);
         object = new Circle(x,y,active.getHeight());
     }
