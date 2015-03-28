@@ -8,28 +8,33 @@ public abstract class Button {
     protected Texture click;
     protected Texture inactive;
     protected Texture current;
-    boolean enable;
-    public Button(String activeimg,String onclickimg,String inactiveimg){
+    private boolean enable;
+    private String message;
+    public float x;
+    public float y;
+    public Button(float x,float y,String activeimg,String onclickimg,String inactiveimg,String message){
+        this.x = x;
+        this.y = y;
         active = new Texture(Gdx.files.internal(activeimg));
         click = new Texture(Gdx.files.internal(onclickimg));
         inactive = new Texture(Gdx.files.internal(inactiveimg));
         current = active;
         enable = true;
+        this.message = message;
     }
     public Texture getImage(){
         return current;
     }
 
-    public boolean onClick() {
+    public void onClick() {
         if (enable)
             current = click;
-        return enable;
     }
 
-    public boolean onRelease() {
+    public String onRelease() {
         if (enable)
-            current = active;
-        return enable;
+            return message;
+        return null;
     }
 
     public void setEnable(boolean enable) {
