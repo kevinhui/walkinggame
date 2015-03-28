@@ -68,7 +68,8 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
            game.batch.draw(button.getImage(), button.x, button.y);
        }
        firstPos -= speed*Gdx.graphics.getDeltaTime();
-       Gdx.app.log("firstPos", String.valueOf(firstPos));
+        if (firstPos<0)
+            forward();
        float accumulator = firstPos;
          for (int i=pointer;i<pointer+sequence.length;i++){
            switch (sequence[i%sequence.length]){
@@ -95,6 +96,7 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
 //        if (Gdx.input.isTouched()){
 //            game.setScreen(new BattleScreen(game));
 //            dispose();
+//            forward();
 //        }
 
     }
@@ -122,9 +124,12 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         camera.unproject(touch.set(screenX,screenY,0));
-        for (Button select:buttons)
+        for (Button select:buttons) {
             if (select.isClicked(touch.x, touch.y))
-                Gdx.app.log("Signal", select.onRelease());
+                if (select.onRelease().charAt(0) == sequence[this.pointer]) {
+                    forward();
+                }
+        }
         return true;
     }
 
@@ -142,4 +147,11 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
     public boolean scrolled(int amount) {
         return false;
     }
+
+    public void forward(){
+        sequence[pointer] = pattern[MathUtils.random(3)];
+        pointer = (pointer+1)%sequence.length;
+        firstPos += smallDown.getWidth();
+    }
+
 }
