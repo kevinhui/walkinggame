@@ -6,7 +6,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
-public class TestScreen extends ScreenAdapter {
+public class TestScreen implements Screen {
     final WalkingGame game;
     OrthographicCamera camera;
     public  TestScreen(final WalkingGame game){
@@ -27,7 +27,13 @@ public class TestScreen extends ScreenAdapter {
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
+        game.font.draw(game.batch,"Test",100,150);
         game.batch.end();
+
+        if (Gdx.input.isTouched()){
+            game.setScreen(new BattleScreen(game));
+            dispose();
+        }
     }
 
     @Override

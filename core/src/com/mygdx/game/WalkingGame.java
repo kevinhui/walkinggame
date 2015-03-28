@@ -11,7 +11,7 @@ public class WalkingGame extends Game {
     public void create() {
         batch = new SpriteBatch();
         font = new BitmapFont();
-        this.setScreen(new TestScreen(this));
+        this.setScreen(new BattleScreen(this));
     }
 
     public void render() {

@@ -5,10 +5,12 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.control.Button;
+import com.mygdx.game.control.EllipseButton;
 import com.mygdx.game.control.RectButton;
 
 public class BattleScreen extends ScreenAdapter implements InputProcessor {
@@ -19,6 +21,13 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
     private int pointer;
     Array<Button> buttons;
     Vector3 touch;
+
+    Texture smallUp;
+    Texture smallDown;
+    Texture smallLeft;
+    Texture smallRight;
+    float firstPos;
+    float speed;
 
     public BattleScreen(final WalkingGame game) {
         this.game = game;
@@ -33,8 +42,18 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         buttons.add(new RectButton(240,0,"Up.png","Up.png","Up.png","k"));
         buttons.add(new RectButton(360,0,"Right.png","Right.png","Right.png","l"));
 
+
         camera = new OrthographicCamera();
         camera.setToOrtho(false,480,800);
+        Gdx.input.setInputProcessor(this);
+
+        smallDown = new Texture(Gdx.files.internal("smallDown.png"));
+        smallLeft = new Texture(Gdx.files.internal("smallLeft.png"));
+        smallRight = new Texture(Gdx.files.internal("smallRight.png"));
+        smallUp = new Texture(Gdx.files.internal("smallUp.png"));
+        pointer = 0;
+        firstPos = camera.viewportWidth;
+        speed = 100;
     }
 
     @Override
@@ -44,10 +63,40 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        for (Button button:buttons) {
-            game.batch.draw(button.getImage(), button.x, button.y);
-        }
-        game.batch.end();
+
+       for (Button button:buttons) {
+           game.batch.draw(button.getImage(), button.x, button.y);
+       }
+       firstPos -= speed*Gdx.graphics.getDeltaTime();
+       Gdx.app.log("firstPos", String.valueOf(firstPos));
+       float accumulator = firstPos;
+         for (int i=pointer;i<pointer+sequence.length;i++){
+           switch (sequence[i%sequence.length]){
+                  case 'h':
+                      game.batch.draw(smallLeft,accumulator,500);
+                      break;
+                  case 'j':
+                      game.batch.draw(smallDown,accumulator,500);
+                      break;
+                  case 'k':
+                      game.batch.draw(smallUp,accumulator,500);
+                      break;
+                  case 'l':
+                      game.batch.draw(smallRight,accumulator,500);
+                      break;
+                  default:
+                      game.batch.draw(smallLeft,accumulator,500);
+                      break;
+              }
+              accumulator += smallDown.getWidth();
+          }
+         game.batch.end();
+
+//        if (Gdx.input.isTouched()){
+//            game.setScreen(new BattleScreen(game));
+//            dispose();
+//        }
+
     }
 
     @Override
