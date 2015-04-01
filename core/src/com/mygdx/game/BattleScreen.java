@@ -22,6 +22,8 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
     Array<Button> buttons;
     Vector3 touch;
 
+    Entity opponent;
+    Entity self;
     Texture smallUp;
     Texture smallDown;
     Texture smallLeft;
