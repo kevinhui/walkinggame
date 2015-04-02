@@ -154,6 +154,7 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         sequence[pointer] = pattern[MathUtils.random(3)];
         pointer = (pointer+1)%sequence.length;
         firstPos += smallDown.getWidth();
+
     }
 
 }
