@@ -5,14 +5,24 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.utils.Timer;
 
 public class TestScreen implements Screen {
+    private int tesxt;
     final WalkingGame game;
     OrthographicCamera camera;
+
     public  TestScreen(final WalkingGame game){
         this.game = game;
         camera = new OrthographicCamera();
         camera.setToOrtho(false,480,800);
+        tesxt = 0;
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                addFive();
+            }
+        },0,1);
     }
 
     @Override
@@ -22,12 +32,12 @@ public class TestScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        game.font.draw(game.batch,"Test",100,150);
+        game.font.draw(game.batch,String.valueOf(tesxt),100,150);
         game.batch.end();
 
         if (Gdx.input.isTouched()){
@@ -59,5 +69,9 @@ public class TestScreen implements Screen {
     @Override
     public void dispose() {
 
+    }
+
+    public void addFive() {
+        tesxt += 1;
     }
 }

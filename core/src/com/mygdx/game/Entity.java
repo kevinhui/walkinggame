@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.utils.Timer;
+
 public class Entity {
     private String name;
     private int health;
@@ -24,6 +26,19 @@ public class Entity {
     }
 
     public void dealDamage(int strength) {
-        health = health - (strength - toughness/3);
+        if (defending)
+            health = health - (strength - 4*toughness/5);
+        else
+            health = health - (strength - toughness/3);
+    }
+
+    public void defend(float second){
+        defending = true;
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                defending = false;
+            }
+        },second);
     }
 }
