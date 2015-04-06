@@ -3,12 +3,15 @@ package com.mygdx.game.skill;
 import com.mygdx.game.Entity;
 
 public class Attack extends Skill{
-    protected Attack(String name, int id, Entity target, Entity caster) {
-        super(name, id, target, caster);
+    public Attack(Entity caster) {
+        super("Attack", 1,  caster, 30, 3);
     }
 
     @Override
     public void execute() {
-        target.dealDamage(caster.getStrength());
+        if (ready && caster.consume(energy)) {
+            target.dealDamage(caster.getStrength());
+            startCooldown();
+        }
     }
 }

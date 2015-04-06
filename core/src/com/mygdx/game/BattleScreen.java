@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,8 +11,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.control.Button;
-import com.mygdx.game.control.EllipseButton;
 import com.mygdx.game.control.RectButton;
+import com.mygdx.game.control.SkillButton;
+import com.mygdx.game.skill.Skill;
 
 public class BattleScreen extends ScreenAdapter implements InputProcessor {
     final WalkingGame game;
@@ -21,6 +23,7 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
     private int pointer;
     Array<Button> buttons;
     Vector3 touch;
+    Music battleMusic;
 
     Entity opponent;
     Entity self;
@@ -30,19 +33,32 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
     Texture smallRight;
     float firstPos;
     float speed;
+    Texture healthBar;
 
-    public BattleScreen(final WalkingGame game) {
+    public BattleScreen(final WalkingGame game,Entity self,Entity opponent) {
         this.game = game;
+        this.self = self;
+        this.opponent = opponent;
         pattern = new char[] {'h','j','k','l'};
         sequence = new char[9];
         touch = new Vector3();
         for (int i=0;i<sequence.length;i++)
             sequence[i] = pattern[MathUtils.random(3)];
-        buttons = new Array<Button>();
+        buttons = new Array<>();
         buttons.add(new RectButton(0,0,"Left.png","Left.png","Left.png","h"));
         buttons.add(new RectButton(120,0,"Down.png","Down.png","Down.png","j"));
         buttons.add(new RectButton(240,0,"Up.png","Up.png","Up.png","k"));
         buttons.add(new RectButton(360,0,"Right.png","Right.png","Right.png","l"));
+        for (Skill skill:self.getSkills()){
+            skill.setTarget(opponent);
+        }
+        buttons.add(new SkillButton(40,140,"skill1.png","skill1.png","skill1_u.png",self.getSkills().get(0).getName(),self.getSkills().get(0)));
+        buttons.add(new SkillButton(200,140,"skill2.png","skill2.png","skill2_u.png",self.getSkills().get(1).getName(),self.getSkills().get(1)));
+        buttons.add(new SkillButton(360,140,"skill3.png","skill3.png","skill3_u.png",self.getSkills().get(2).getName(),self.getSkills().get(2)));
+
+        battleMusic = Gdx.audio.newMusic(Gdx.files.internal("Ectoplasm.mp3"));
+        battleMusic.setLooping(true);
+        battleMusic.play();
 
 
         camera = new OrthographicCamera();
@@ -56,6 +72,8 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         pointer = 0;
         firstPos = camera.viewportWidth;
         speed = 100;
+
+        healthBar = new Texture(Gdx.files.internal("Health.png"));
     }
 
     @Override
@@ -67,33 +85,16 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         game.batch.begin();
 
        for (Button button:buttons) {
+           if (button instanceof SkillButton){
+               ((SkillButton) button).update();
+           }
            game.batch.draw(button.getImage(), button.x, button.y);
        }
-       firstPos -= speed*Gdx.graphics.getDeltaTime();
-        if (firstPos<0)
-            forward();
-       float accumulator = firstPos;
-         for (int i=pointer;i<pointer+sequence.length;i++){
-           switch (sequence[i%sequence.length]){
-                  case 'h':
-                      game.batch.draw(smallLeft,accumulator,500);
-                      break;
-                  case 'j':
-                      game.batch.draw(smallDown,accumulator,500);
-                      break;
-                  case 'k':
-                      game.batch.draw(smallUp,accumulator,500);
-                      break;
-                  case 'l':
-                      game.batch.draw(smallRight,accumulator,500);
-                      break;
-                  default:
-                      game.batch.draw(smallLeft,accumulator,500);
-                      break;
-              }
-              accumulator += smallDown.getWidth();
-          }
-         game.batch.end();
+
+        drawSequence();
+        game.batch.draw(healthBar, 0,240,camera.viewportWidth*self.getHealthPercentage(),30);
+
+        game.batch.end();
 
 //        if (Gdx.input.isTouched()){
 //            game.setScreen(new BattleScreen(game));
@@ -101,6 +102,34 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
 //            forward();
 //        }
 
+    }
+
+    private void drawSequence() {
+        firstPos -= speed*Gdx.graphics.getDeltaTime();
+        if (firstPos<0)
+            forward();
+        float accumulator = firstPos;
+        for (int i=pointer;i<pointer+sequence.length;i++){
+            switch (sequence[i%sequence.length]){
+                case 'h':
+                    game.batch.draw(smallLeft,accumulator,270);
+//                    game.batch.draw(smallLeft,accumulator,270,0,40,60,30);
+                    break;
+                case 'j':
+                    game.batch.draw(smallDown,accumulator,270);
+                    break;
+                case 'k':
+                    game.batch.draw(smallUp,accumulator,270);
+                    break;
+                case 'l':
+                    game.batch.draw(smallRight,accumulator,270);
+                    break;
+                default:
+                    game.batch.draw(smallLeft,accumulator,270);
+                    break;
+            }
+            accumulator += smallDown.getWidth();
+        }
     }
 
     @Override
@@ -128,7 +157,12 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         camera.unproject(touch.set(screenX,screenY,0));
         for (Button select:buttons) {
             if (select.isClicked(touch.x, touch.y))
-                if (select.onRelease().charAt(0) == sequence[this.pointer]) {
+                if (select instanceof SkillButton){
+                    if (select.onRelease()!=null)
+                        Gdx.app.log("GAMEMessage", String.valueOf(self.getSkills().get(0).isReady()));
+//                        ((SkillButton) select).animate(game.batch,Gdx.graphics.getDeltaTime());
+                } else if (select.onRelease().charAt(0) == sequence[this.pointer]) {
+                    self.addEnergy(self.getConcentration());
                     forward();
                 }
         }
