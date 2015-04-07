@@ -87,6 +87,10 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
        for (Button button:buttons) {
            if (button instanceof SkillButton){
                ((SkillButton) button).update();
+               int cooldowntime = ((SkillButton) button).getCooldowntime();
+               if (cooldowntime>0) {
+                   game.font.draw(game.batch, String.valueOf(cooldowntime), button.x+35, button.y + 0);
+               }
            }
            game.batch.draw(button.getImage(), button.x, button.y);
        }

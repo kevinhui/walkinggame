@@ -1,10 +1,5 @@
 package com.mygdx.game.control;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.utils.Timer;
 import com.mygdx.game.skill.Skill;
 
 
@@ -31,6 +26,10 @@ public class SkillButton extends EllipseButton {
         } else {
             this.setEnable(false);
         }
+    }
+
+    public int getCooldowntime(){
+        return skill.getCooldowntime();
     }
 
 //    float accumulator;

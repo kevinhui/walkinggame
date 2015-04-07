@@ -11,6 +11,7 @@ public abstract class Skill {
     protected final int energy;
     protected final int cooldown;
     protected boolean ready;
+    private int cooldowntime;
 
     protected Skill(String name, int id, Entity caster, int energy, int cooldown) {
         this.name = name;
@@ -23,20 +24,24 @@ public abstract class Skill {
 
     protected void startCooldown(){
         ready = false;
+        cooldowntime = cooldown;
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
-                ready = true;
+                cooldowntime--;
+                if (cooldowntime==0) {
+                    ready = true;
+                }
             }
-        }, cooldown);
+        },0,1,cooldown-1);
     }
 
     public String getName() {
         return name;
     }
 
-    public int getCooldown() {
-        return cooldown;
+    public int getCooldowntime() {
+        return cooldowntime;
     }
 
     public abstract void execute();
