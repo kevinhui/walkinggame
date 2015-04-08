@@ -13,20 +13,18 @@ public class Entity {
     private int currenthealth;
     private int strength;
     private int toughness;
-    private int dexterity;
     private int concentration;
     private boolean defending;
     private int energy;
     private Array<Skill> skills;
-    private Array<Item> items;
+//    private Array<Item> items;
 
-    public Entity(String name, int basehealth, int strength, int toughness, int dexterity, int concentration) {
+    public Entity(String name, int basehealth, int strength, int toughness, int concentration) {
         this.name = name;
         this.basehealth = basehealth;
         this.currenthealth = this.basehealth;
         this.strength = strength;
         this.toughness = toughness;
-        this.dexterity = dexterity;
         this.concentration = concentration;
         this.defending = false;
         energy = 0;
@@ -46,10 +44,6 @@ public class Entity {
 
     public int getToughness() {
         return toughness;
-    }
-
-    public int getDexterity() {
-        return dexterity;
     }
 
     public int getConcentration() {

@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -8,6 +8,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.Timer;
+import com.google.gson.Gson;
+import com.mygdx.game.Entity;
+import com.mygdx.game.JSONObject.Item;
+import com.mygdx.game.Parse;
+import com.mygdx.game.WalkingGame;
+import com.mygdx.game.screen.BattleScreen;
 
 
 public class TestScreen implements Screen {
@@ -34,13 +40,21 @@ public class TestScreen implements Screen {
         battleMusic.setLooping(true);
         battleMusic.play();
 
-        parse = new Parse();
-        parse.getUserID();
-
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("LeagueGothic-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 20;
         font = generator.generateFont(parameter);
+
+        Item item = new Item();
+        item.setBasehealth(100);
+        item.setConcentration(10);
+        item.setName("Test");
+        item.setStrength(20);
+        item.setToughness(5);
+        item.setType(1);
+        Gson gson = new Gson();
+        Gdx.app.log("GSON",gson.toJson(item));
+        Gdx.app.log("GSON", gson.fromJson("{\"Type\":0,\"basehealth\":0,\"concentration\":1,\"createdAt\":\"2015-04-08T03:05:34.749Z\",\"name\":\"Wooden Sword\",\"objectId\":\"bjeWQpYdLE\",\"strength\":10,\"toughness\":0,\"updatedAt\":\"2015-04-08T03:06:17.809Z\"}", Item.class).getName());
     }
 
     @Override
@@ -60,7 +74,7 @@ public class TestScreen implements Screen {
         game.batch.end();
 
         if (Gdx.input.isTouched()){
-            game.setScreen(new BattleScreen(game,new Entity("123",100,10,10,10,10),new Entity("456",10,10,10,10,10)));
+            game.setScreen(new BattleScreen(game,new Entity("123",100,10,10, 10),new Entity("456",10,10,10, 10)));
             battleMusic.dispose();
             dispose();
         }

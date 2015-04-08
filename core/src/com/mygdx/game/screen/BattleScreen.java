@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.Entity;
+import com.mygdx.game.WalkingGame;
 import com.mygdx.game.control.Button;
 import com.mygdx.game.control.RectButton;
 import com.mygdx.game.control.SkillButton;
@@ -96,7 +98,7 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
        }
 
         drawSequence();
-        game.batch.draw(healthBar, 0,240,camera.viewportWidth*self.getHealthPercentage(),30);
+        game.batch.draw(healthBar, 0, 240, camera.viewportWidth * self.getHealthPercentage(), 30);
 
         game.batch.end();
 
