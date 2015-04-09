@@ -7,8 +7,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 public class Parse{
-    private String app_id;
-    private String app_key;
+    private final String app_id;
+    private final String app_key;
     private Net.HttpResponseListener listener;
 
     public Parse(Net.HttpResponseListener listener){
@@ -36,6 +36,21 @@ public class Parse{
         httpGET.setHeader("X-Parse-REST-API-Key", app_key);
         try {
             httpGET.setContent(URLEncoder.encode(content,"UTF-8"));
+            httpGET.setContent(content);
+        } catch (UnsupportedEncodingException e) {
+            Gdx.app.log("RESTConnection",e.getMessage());
+        }
+        Gdx.net.sendHttpRequest(httpGET, listener);
+    }
+
+    public void getUserID(){
+        Net.HttpRequest httpGET = new Net.HttpRequest(Net.HttpMethods.GET);
+        httpGET.setUrl("https://api.parse.com/1/classes/User/");
+        httpGET.setHeader("Content-Type","application/json");
+        httpGET.setHeader("X-Parse-Application-Id", app_id);
+        httpGET.setHeader("X-Parse-REST-API-Key", app_key);
+        try {
+            httpGET.setContent(URLEncoder.encode("where={\"userID\":\"asjkf\"}","UTF-8"));
         } catch (UnsupportedEncodingException e) {
             Gdx.app.log("RESTConnection",e.getMessage());
         }
@@ -47,6 +62,7 @@ public class Parse{
         httpGET.setUrl("https://api.parse.com/1/classes/"+ table +"/"+ID);
         httpGET.setHeader("X-Parse-Application-Id", app_id);
         httpGET.setHeader("X-Parse-REST-API-Key", app_key);
+        Gdx.net.sendHttpRequest(httpGET, listener);
     }
 
 }

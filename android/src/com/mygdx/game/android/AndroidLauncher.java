@@ -15,7 +15,7 @@ public class AndroidLauncher extends AndroidApplication implements NativeFunctio
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		initialize(new WalkingGame(), config);
+		initialize(new WalkingGame(this), config);
 	}
 
 
