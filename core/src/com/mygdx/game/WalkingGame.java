@@ -1,15 +1,23 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.google.gson.Gson;
 import com.mygdx.game.screen.LoadingScreen;
+import com.mygdx.game.screen.ScanScreen;
 import com.mygdx.game.screen.TestScreen;
 
 public class WalkingGame extends Game {
     public SpriteBatch batch;
     public BitmapFont font;
     public NativeFunctions nativeFunctions;
+    public User user;
+    public Texture background;
 
     public WalkingGame(NativeFunctions nativeFunctions){
         super();
@@ -17,9 +25,16 @@ public class WalkingGame extends Game {
     }
 
     public void create() {
+        background = new Texture("background.png");
         batch = new SpriteBatch();
-        font = new BitmapFont();
-        this.setScreen(new LoadingScreen(this));
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("hurry up.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 40;
+        parameter.borderWidth = 3;
+        font = generator.generateFont(parameter);
+//        font = new BitmapFont();
+//        this.setScreen(new LoadingScreen(this));
+        this.setScreen(new TestScreen(this));
     }
 
     public void render() {
@@ -29,5 +44,11 @@ public class WalkingGame extends Game {
     public void dispose(){
         batch.dispose();
         font.dispose();
+        background.dispose();
+    }
+
+    public void update(){
+        Parse parse = new Parse();
+        parse.putRequest("User",user.getObjectId(),new Gson().toJson(user));
     }
 }

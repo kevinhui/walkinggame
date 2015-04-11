@@ -5,45 +5,70 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mygdx.game.NewPlayer;
 import com.mygdx.game.Parse;
+import com.mygdx.game.User;
 import com.mygdx.game.WalkingGame;
 
 public class LoadingScreen extends ScreenAdapter implements Net.HttpResponseListener{
     private WalkingGame game;
     private OrthographicCamera camera;
-    private Parse parse;
     private int statusCode;
     private String result;
+    private String message;
+
     public LoadingScreen(WalkingGame game){
         this.game = game;
-        this.parse = new Parse(this);
         camera = new OrthographicCamera();
         camera.setToOrtho(false,480,800);
         statusCode = 0;
-        result = "";
+        result = null;
+        message = "Loading";
     }
 
     @Override
     public void show(){
         String macAddress = game.nativeFunctions.getMacAddress();
-        if (macAddress!=null){
-            parse.getRequest("User", "where={\"MacAddress\":\"" + "asdsa" + "\"}");
-//            JsonObject json = new Gson().fromJson(result,JsonObject.class);
-//            Gdx.app.log("REST1",json.get("result").toString());
-//            Gdx.app.log("REST1", String.valueOf(json.get("result").toString().isEmpty()));
+        if (!game.nativeFunctions.isWifiEnabled()){
+            message = "Error: No Network Connectivity";
+        } else if (macAddress != null){
+            Parse parse = new Parse(this);
+            parse.getRequest("User", "where={\"MacAddress\":\"" + macAddress + "\"}");
         }
     }
 
     @Override
     public void render(float delta){
+        if (result!=null){
+            JsonObject jobj = new Gson().fromJson(result, JsonObject.class);
+            result = null;
+            JsonArray results = jobj.getAsJsonArray("results");
+//            Gdx.app.log("RESTTEST", String.valueOf(jobj.getAsJsonArray("results").toString()));
+            if (results.size()==0){
+                NewPlayer newPlayer = new NewPlayer(game);
+                Gdx.input.getTextInput(newPlayer, "Register", "", "Username");
+                game.setScreen(new MainScreen(game));
+                dispose();
+            } else{
+                game.user = new Gson().fromJson(results.get(0),User.class);
+                Gdx.app.log("JSON", new Gson().toJson(game.user));
+                game.setScreen(new MainScreen(game));
+                dispose();
+//            Gdx.app.log("RESTDATA", game.user.getObjectId() + " " + game.user.getUserID() + " " + game.user.getSteps()+" "+game.user.getStageID());
+            }
+        }
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        game.font.draw(game.batch, "Loading", 240,400);
+        game.batch.draw(game.background,0,0);
+        game.font.draw(game.batch, message, (camera.viewportWidth- game.font.getBounds(message).width)/2,(camera.viewportHeight-game.font.getBounds(message).height)/2);
         game.batch.end();
     }
 
@@ -51,16 +76,6 @@ public class LoadingScreen extends ScreenAdapter implements Net.HttpResponseList
     public void handleHttpResponse(Net.HttpResponse httpResponse) {
         statusCode = httpResponse.getStatus().getStatusCode();
         result = httpResponse.getResultAsString();
-        Gdx.app.log("RESTConnection",result);
-//        JsonObject json = new Gson().fromJson(result,JsonObject.class);
-//        Gdx.app.log("REST1",json.get("result").toString());
-//        Gdx.app.log("REST1", String.valueOf(json.get("result").toString().isEmpty()));
-        String myJSONString = result;
-JsonObject jobj = new Gson().fromJson(result, JsonObject.class);
-
-int resul = jobj.getAsJsonArray("results").size();
-
-        Gdx.app.log("RESTTEST", String.valueOf(resul));
     }
 
     @Override
@@ -71,9 +86,5 @@ int resul = jobj.getAsJsonArray("results").size();
     @Override
     public void cancelled() {
 
-    }
-
-    public void showResult(){
-        Gdx.app.log("REST1",result);
     }
 }

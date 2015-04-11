@@ -43,4 +43,5 @@ public abstract class Button {
     }
 
     public abstract boolean isClicked(float x,float y);
+
 }

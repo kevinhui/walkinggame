@@ -36,10 +36,13 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
     float firstPos;
     float speed;
     Texture healthBar;
+    Texture healthBg;
+    Texture battleBg;
 
     public BattleScreen(final WalkingGame game,Entity self,Entity opponent) {
         this.game = game;
         this.self = self;
+        self.dealDamage(10);
         this.opponent = opponent;
         pattern = new char[] {'h','j','k','l'};
         sequence = new char[9];
@@ -76,6 +79,8 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         speed = 100;
 
         healthBar = new Texture(Gdx.files.internal("Health.png"));
+        healthBg = new Texture("Health_bg.png");
+        battleBg = new Texture("battle_bg.png");
     }
 
     @Override
@@ -86,19 +91,24 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
 
+        game.batch.draw(battleBg,0,0,0,190,480,800);
+        game.batch.draw(game.background,0,0,0,10,480,340);
+
        for (Button button:buttons) {
+           game.batch.draw(button.getImage(), button.x, button.y);
            if (button instanceof SkillButton){
                ((SkillButton) button).update();
                int cooldowntime = ((SkillButton) button).getCooldowntime();
                if (cooldowntime>0) {
-                   game.font.draw(game.batch, String.valueOf(cooldowntime), button.x+35, button.y + 0);
+                   game.font.draw(game.batch, String.valueOf(cooldowntime), button.x+button.getImage().getWidth()/2, button.y + button.getImage().getHeight()/2);
                }
            }
-           game.batch.draw(button.getImage(), button.x, button.y);
        }
 
         drawSequence();
-        game.batch.draw(healthBar, 0, 240, camera.viewportWidth * self.getHealthPercentage(), 30);
+//        game.batch.draw(healthBar, 0, 240, camera.viewportWidth * self.getHealthPercentage(), 30);
+        game.batch.draw(healthBg,0,240);
+        game.batch.draw(healthBar, 0, 240,0,0, (int) (camera.viewportWidth * self.getHealthPercentage()), 30);
 
         game.batch.end();
 
@@ -135,6 +145,13 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
                     break;
             }
             accumulator += smallDown.getWidth();
+        }
+    }
+
+    @Override
+    public void dispose(){
+        for (int i=0;i<buttons.size;i++){
+            buttons.removeIndex(i);
         }
     }
 

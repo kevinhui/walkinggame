@@ -14,7 +14,7 @@ android {
         instrumentTest.setRoot('tests')
     }
     defaultConfig {
-        minSdkVersion 7
+        minSdkVersion 15
         targetSdkVersion 21
     }
     compileOptions {
@@ -123,4 +123,6 @@ idea {
     }
 }
 dependencies {
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.google.android.gms:play-services:7.0.0'
 }

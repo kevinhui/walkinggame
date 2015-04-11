@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.mygdx.game.skill.Attack;
@@ -8,6 +10,7 @@ import com.mygdx.game.skill.Defend;
 import com.mygdx.game.skill.Skill;
 
 public class Entity {
+    private static final int FRAME_COL = 8;
     private String name;
     private final int basehealth;
     private int currenthealth;
@@ -17,9 +20,11 @@ public class Entity {
     private boolean defending;
     private int energy;
     private Array<Skill> skills;
-//    private Array<Item> items;
+    private TextureRegion[] walkFrames;
+    private TextureRegion[] attackFrames;
+    private TextureRegion[] injureFrames;
 
-    public Entity(String name, int basehealth, int strength, int toughness, int concentration) {
+    public Entity(String name, int basehealth, int strength, int toughness, int concentration, Texture spriteSheet) {
         this.name = name;
         this.basehealth = basehealth;
         this.currenthealth = this.basehealth;
@@ -32,6 +37,16 @@ public class Entity {
         skills.add(new Attack(this));
         skills.add(new Defend(this));
         skills.add(new Blast(this));
+        TextureRegion[][] tmp = TextureRegion.split(spriteSheet,spriteSheet.getWidth()/FRAME_COL,spriteSheet.getHeight());
+        for (int i=0;i<4;i++){
+            walkFrames[i] = tmp[0][i];
+        }
+        for (int i=4;i<6;i++){
+            attackFrames[i-4] = tmp[0][i];
+        }
+        for (int i=6;i<8;i++){
+            attackFrames[i-6] = tmp[0][i];
+        }
     }
 
     public String getName() {
@@ -95,4 +110,15 @@ public class Entity {
         return (float) currenthealth/basehealth;
     }
 
+    public TextureRegion[] getWalkFrames() {
+        return walkFrames;
+    }
+
+    public TextureRegion[] getAttackFrames() {
+        return attackFrames;
+    }
+
+    public TextureRegion[] getInjureFrames() {
+        return injureFrames;
+    }
 }

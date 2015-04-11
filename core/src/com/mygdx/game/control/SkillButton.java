@@ -32,18 +32,4 @@ public class SkillButton extends EllipseButton {
         return skill.getCooldowntime();
     }
 
-//    float accumulator;
-//    public void animate(final Batch batch, final float delta){
-//        accumulator = 0;
-//        Timer.schedule(new Timer.Task() {
-//            @Override
-//            public void run() {
-//                batch.begin();
-//                batch.draw(inactive,x,y,0,0,inactive.getWidth(), inactive.getHeight() - (int) accumulator);
-//                batch.end();
-//                accumulator += current.getHeight()*delta/skill.getCooldown();
-//            }
-//        },0,skill.getCooldown(), (int) (skill.getCooldown()/delta));
-//    }
-
 }
