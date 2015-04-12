@@ -4,7 +4,7 @@ import com.mygdx.game.Entity;
 
 public class Blast extends Skill {
     public Blast(Entity caster) {
-        super("Blast", 3,  caster, 50, 5);
+        super("Blast", 3,  caster, 100, 5);
     }
 
     @Override

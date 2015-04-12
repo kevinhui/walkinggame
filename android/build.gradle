@@ -14,7 +14,7 @@ android {
         instrumentTest.setRoot('tests')
     }
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 21
     }
     compileOptions {

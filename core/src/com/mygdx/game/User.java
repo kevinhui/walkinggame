@@ -147,7 +147,7 @@ public class User {
     }
 
     public Entity createEntity(){
-        return new Entity(userID,basehealth,strength,toughness,concentration,new Texture(spriteSheet));
+        return new Entity(userID,basehealth,strength,toughness,concentration,new Texture(spriteSheet),false);
     }
 
 }

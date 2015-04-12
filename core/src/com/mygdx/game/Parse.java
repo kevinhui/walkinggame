@@ -56,6 +56,15 @@ public class Parse implements Net.HttpResponseListener{
         Gdx.net.sendHttpRequest(httpGET, listener);
     }
 
+    public void getRequestByIdContent(String table,String ID,String content){
+        Net.HttpRequest httpGET = new Net.HttpRequest(Net.HttpMethods.GET);
+        httpGET.setUrl("https://api.parse.com/1/classes/"+ table +"/"+ID);
+        httpGET.setHeader("X-Parse-Application-Id", app_id);
+        httpGET.setHeader("X-Parse-REST-API-Key", app_key);
+        httpGET.setContent(content);
+        Gdx.net.sendHttpRequest(httpGET, listener);
+    }
+
     public void putRequest(String table, String ID, String content){
         Net.HttpRequest httpPUT = new Net.HttpRequest(Net.HttpMethods.PUT);
         httpPUT.setUrl("https://api.parse.com/1/classes/"+ table +"/"+ID);

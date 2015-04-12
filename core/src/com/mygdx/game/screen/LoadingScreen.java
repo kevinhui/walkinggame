@@ -56,7 +56,6 @@ public class LoadingScreen extends ScreenAdapter implements Net.HttpResponseList
                 dispose();
             } else{
                 game.user = new Gson().fromJson(results.get(0),User.class);
-                Gdx.app.log("JSON", new Gson().toJson(game.user));
                 game.setScreen(new MainScreen(game));
                 dispose();
 //            Gdx.app.log("RESTDATA", game.user.getObjectId() + " " + game.user.getUserID() + " " + game.user.getSteps()+" "+game.user.getStageID());

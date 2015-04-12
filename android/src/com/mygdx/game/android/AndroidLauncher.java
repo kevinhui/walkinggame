@@ -1,7 +1,15 @@
 package com.mygdx.game.android;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -13,6 +21,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.view.ContextThemeWrapper;
+import android.view.WindowManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -26,43 +35,26 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.mygdx.game.NativeFunctions;
 import com.mygdx.game.WalkingGame;
 
-public class AndroidLauncher extends AndroidApplication implements NativeFunctions, ConnectionCallbacks, OnConnectionFailedListener{
-    private Handler uiThread;
+public class AndroidLauncher extends AndroidApplication implements NativeFunctions, ConnectionCallbacks, OnConnectionFailedListener, SensorEventListener{
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometerSensor;
+    private float mLimit = 10;
+    private float mLastValues[] = new float[3*2];
+    private float mScale[] = new float[2];
+    private float mYOffset;
+    private float mLastDirections[] = new float[3*2];
+    private float mLastExtremes[][] = { new float[3*2], new float[3*2] };
+    private float mLastDiff[] = new float[3*2];
+    private int mLastMatch = -1;
+    private int stepCount = 0;
+    private boolean stepCounterEnable = false;
+
     private String QRreaderResult;
-    private LocationManager mLocationMgr;
-    private String provider;
     private Location location;
     private GoogleApiClient mGoogleApiClient;
     private double lot;
     private double lat;
 
-
-//    @Override
-//    public void openScanReader(){
-//        final IntentIntegrator integrator = new IntentIntegrator(new Activity(){
-//            public void onActivityResult(int requestCode, int resultCode, Intent intent)  {
-//                IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-//                CharSequence text;
-//                if (scanResult != null) {
-//
-//                    text = scanResult.getContents();
-//                    if (text == null || text.length()==0){text= "Sorry!! Try Again!!";}
-//                    else {
-//                        int seed=0;
-//                        for(int i=0;i<text.length();i++) {
-//                            seed += (int)text.charAt(i);
-//                        }
-//                        text = text + " " +Integer.toString(seed);
-//                        QRreaderResult = text;
-//                    }
-//                } else {
-//                    text = "Sorry!! Try Again!!";
-//                }
-//            }
-//
-//        });
-//        integrator.initiateScan();
-//    }
     @Override
     public void openScanReader(){
         QRreaderResult = null;
@@ -89,42 +81,35 @@ public class AndroidLauncher extends AndroidApplication implements NativeFunctio
         QRreaderResult = null;
     }
 
-    @Override
-    public void setUpGeoService(){
-        mLocationMgr = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        boolean enabled = mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-        if (!enabled) {
-            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-        }
-        Criteria criteria = new Criteria();
-        provider = mLocationMgr.getBestProvider(criteria,false);
-        location = mLocationMgr.getLastKnownLocation(provider);
-    }
-
-    @Override
-    public double getLatitude(){
-        if (mLocationMgr == null){setUpGeoService();}
-        return location.getLatitude();
-    }
-    @Override
-    public double getLongitude(){
-        if (mLocationMgr == null){setUpGeoService();}
-        if (location == null) return 0;
-        return location.getLongitude();
-    }
-
-
-
-
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
+        int h = 480;
+        mYOffset = h*0.5f;
+        mScale[0] = - (h * 0.5f * (1.0f / (SensorManager.STANDARD_GRAVITY * 2)));
+        mScale[1] = - (h * 0.5f * (1.0f / (SensorManager.MAGNETIC_FIELD_EARTH_MAX)));
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		initialize(new WalkingGame(this), config);
-        uiThread = new Handler();
 	}
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        //Step Counter Method
+        if(stepCounterEnable) {
+            boolean a = mSensorManager.registerListener(this, mAccelerometerSensor,SensorManager.SENSOR_DELAY_FASTEST);
+        }
+    }
+    protected void onDestroy(){
+        super.onDestroy();
+        //Step Counter Method
+        if(stepCounterEnable) {
+            mSensorManager.unregisterListener(this, mAccelerometerSensor);
+        }
+    }
 
     @Override
     public String getMacAddress() {
@@ -148,8 +133,10 @@ public class AndroidLauncher extends AndroidApplication implements NativeFunctio
     @Override
     public void onConnected(Bundle bundle) {
         location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        lat = location.getLatitude();
-        lot = location.getLongitude();
+        if (location!=null) {
+            lat = location.getLatitude();
+            lot = location.getLongitude();
+        }
     }
 
     @Override
@@ -170,8 +157,89 @@ public class AndroidLauncher extends AndroidApplication implements NativeFunctio
     }
     @Override
     public double[] getGeolocation(){
-       if(mGoogleApiClient==null){buildGoogleApiClient();}
+        if(mGoogleApiClient==null){buildGoogleApiClient();}
         mGoogleApiClient.connect();
         return new double[]{lat,lot};
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        Sensor sensor = event.sensor;
+        float[] values = event.values;
+        int value = -1;
+        if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            // For test only. Only allowed value is 1.0 i.e. for step taken
+            //  textView.setText("Step Detector Detected : " + value);
+
+            Sensor sensorAcc = event.sensor;
+            synchronized (this) {
+
+                int j = (sensorAcc.getType() == Sensor.TYPE_ACCELEROMETER) ? 1 : 0;
+                if (j == 1) {
+                    float vSum = 0;
+                    for (int i = 0; i < 3; i++) {
+                        final float v = mYOffset + event.values[i] * mScale[j];
+                        vSum += v;
+                    }
+                    int k = 0;
+                    float v = vSum / 3;
+                    float direction = (v > mLastValues[k] ? 1 : (v < mLastValues[k] ? -1 : 0));
+                    if (direction == -mLastDirections[k]) {
+// Direction changed
+                        int extType = (direction > 0 ? 0 : 1); // minumum or maximum?
+                        mLastExtremes[extType][k] = mLastValues[k];
+                        float diff = Math.abs(mLastExtremes[extType][k] - mLastExtremes[1 - extType][k]);
+                        if (diff > mLimit) {
+                            boolean isAlmostAsLargeAsPrevious = diff > (mLastDiff[k] * 2 / 3);
+                            boolean isPreviousLargeEnough = mLastDiff[k] > (diff / 3);
+                            boolean isNotContra = (mLastMatch != 1 - extType);
+                            if (isAlmostAsLargeAsPrevious && isPreviousLargeEnough && isNotContra) {
+                                stepCount++;
+                                mLastMatch = extType;
+                            } else {
+                                mLastMatch = -1;
+                            }
+                        }
+                        mLastDiff[k] = diff;
+                    }
+                    mLastDirections[k] = direction;
+                    mLastValues[k] = v;
+                }
+            }
+
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    @Override
+    public int getStepCount() {
+        return stepCount;
+    }
+
+    @Override
+    public void resetStepCount() {
+        stepCount = 0;
+    }
+
+    @Override
+    public void enableStepCounter(){
+        stepCounterEnable = true;
+        boolean a = mSensorManager.registerListener(this, mAccelerometerSensor,SensorManager.SENSOR_DELAY_FASTEST);
+    }
+
+    @Override
+    public void disableStepCounter(){
+        stepCounterEnable = false;
+        mSensorManager.unregisterListener(this, mAccelerometerSensor);
+    }
+
+    //Background Step Counter Method
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        mSensorManager.registerListener(this, mAccelerometerSensor,SensorManager.SENSOR_DELAY_FASTEST);
+        return Service.START_STICKY;
     }
 }

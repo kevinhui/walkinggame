@@ -4,7 +4,7 @@ import com.mygdx.game.Entity;
 
 public class Defend extends Skill{
     public Defend(Entity caster) {
-        super("Defend", 2,  caster, 20, 2);
+        super("Defend", 2,  caster, 40, 2);
     }
 
     @Override

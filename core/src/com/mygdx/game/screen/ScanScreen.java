@@ -15,9 +15,11 @@ public class ScanScreen extends MenuScreen implements Net.HttpResponseListener {
     private String result;
     private Consumable consumable;
     private Texture consumableIcon;
+    private String message;
 
     public ScanScreen(final WalkingGame game) {
         super(game);
+        message = "Starting Scanner...";
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
@@ -37,13 +39,17 @@ public class ScanScreen extends MenuScreen implements Net.HttpResponseListener {
             game.batch.draw(button.getImage(), button.x, button.y);
         }
         if (game.nativeFunctions.getQRreaderResult()!=null){
-            new Parse(this).getRequestById("Consumable", game.nativeFunctions.getQRreaderResult());
+            if (game.nativeFunctions.getQRreaderResult().equals(""))
+                message = "Invalid QR Code";
+            else
+                new Parse(this).getRequestById("Consumable", game.nativeFunctions.getQRreaderResult());
             game.nativeFunctions.resetQRreaderResult();
         }
         if (consumable!=null){
-            Gdx.app.log("TEST",consumable.getImagePath());
             consumableIcon = new Texture(consumable.getImagePath());
             game.batch.draw(consumableIcon,(camera.viewportWidth-consumableIcon.getWidth())/2,300);
+        } else {
+            game.font.draw(game.batch, message, (camera.viewportWidth- game.font.getBounds(message).width)/2,(camera.viewportHeight-game.font.getBounds(message).height)/2);
         }
         game.batch.end();
     }
@@ -57,6 +63,8 @@ public class ScanScreen extends MenuScreen implements Net.HttpResponseListener {
             game.user.use(consumable);
             game.update();
 //            new Parse().deleteRequest("Consumable",consumable.getObjectId());
+        } else {
+            message = "Invalid QR Code";
         }
     }
 

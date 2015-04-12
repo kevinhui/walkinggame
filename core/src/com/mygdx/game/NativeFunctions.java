@@ -6,11 +6,13 @@ public interface NativeFunctions {
     public void openScanReader();
     public String getQRreaderResult();
     public void resetQRreaderResult();
-    public double getLongitude();
+    public double[] getGeolocation();
 
-    void setUpGeoService();
+    public int getStepCount();
 
-    public double getLatitude();
+    public void resetStepCount();
 
-    double[] getGeolocation();
+    public void enableStepCounter();
+
+    public void disableStepCounter();
 }

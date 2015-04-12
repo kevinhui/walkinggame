@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.google.gson.Gson;
 import com.mygdx.game.screen.LoadingScreen;
+import com.mygdx.game.screen.ResultScreen;
 import com.mygdx.game.screen.ScanScreen;
 import com.mygdx.game.screen.TestScreen;
 
@@ -33,8 +34,8 @@ public class WalkingGame extends Game {
         parameter.borderWidth = 3;
         font = generator.generateFont(parameter);
 //        font = new BitmapFont();
-//        this.setScreen(new LoadingScreen(this));
-        this.setScreen(new TestScreen(this));
+        this.setScreen(new LoadingScreen(this));
+//        this.setScreen(new TestScreen(this));
     }
 
     public void render() {
@@ -42,6 +43,7 @@ public class WalkingGame extends Game {
     }
 
     public void dispose(){
+        update();
         batch.dispose();
         font.dispose();
         background.dispose();

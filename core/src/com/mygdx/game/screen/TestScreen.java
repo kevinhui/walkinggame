@@ -46,7 +46,7 @@ public class TestScreen implements Screen {
 
     @Override
     public void show() {
-
+//        game.nativeFunctions.testNot();
     }
 boolean cam = false;
     @Override
@@ -61,7 +61,7 @@ boolean cam = false;
         game.batch.end();
 
         if (Gdx.input.isTouched()){
-            game.setScreen(new BattleScreen(game,new Entity("123",100,10,10, 10, new Texture("horny sprite.png")),new Entity("456",10,10,10, 10,new Texture("horny sprite.png"))));
+            game.setScreen(new BattleScreen(game,new Entity("123",100,10,10, 10, new Texture("horny sprite.png"),false),new Entity("456",30,10,10, 5,new Texture("horny sprite.png"),true)));
             battleMusic.dispose();
             dispose();
 //            if (!cam){
