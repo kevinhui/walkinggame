@@ -3,11 +3,10 @@ package com.mygdx.game.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 import com.google.gson.Gson;
 import com.mygdx.game.Entity;
-import com.mygdx.game.GPSResponseHandler;
+import com.mygdx.game.GPSHandler;
 import com.mygdx.game.Parse;
 import com.mygdx.game.Stage;
 import com.mygdx.game.WalkingGame;
@@ -23,13 +22,13 @@ public class StageScreen extends MenuScreen implements Net.HttpResponseListener{
     private boolean started;
     private boolean requestSent;
     private double[] position;
-    private GPSResponseHandler handler;
+    private GPSHandler handler;
 
     public StageScreen(WalkingGame game) {
         super(game);
         new Parse(this).getRequestByIdContent("Stage",game.user.getStage().getObjectId(),"include=Entity");
-        startButton = new RectButton(200,500,"button-160x60.png","button-160x60.png","button-160x60.png","Start");
-        searchButton = new RectButton(200,300,"button-160x60.png","button-160x60.png","button-160x60.png","Search");
+        startButton = new RectButton(200,500,"button_START160x60.png","button_START160x60.png","button_START160x60.png","Start");
+        searchButton = new RectButton(200,300,"button_START160x60.png","button_START160x60.png","button_START160x60.png","Search");
         buttons.add(startButton);
         buttons.add(searchButton);
         started = false;
@@ -40,14 +39,9 @@ public class StageScreen extends MenuScreen implements Net.HttpResponseListener{
     public void render(float delta){
         if (position[0]==0&&position[1]==0) {
             position = game.nativeFunctions.getGeolocation();
-        } else if (opponent==null&&!requestSent){
-            handler = new GPSResponseHandler();
-            new Parse(handler).getRequest("GPSStage","include=Entity,where={\"Position\":{\"$nearSphere\":{\"__type\":\"GeoPoint\",\"latitude\":"+position[0]+",\"longitude\":"+position[1]+"}}}");
-            Gdx.app.log("JSONJSONnew","include=Entity,where={\"Position\":{\"$nearSphere\":{\"__type\":\"GeoPoint\",\"latitude\":"+position[0]+",\"longitude\":"+position[1]+"}}}");
-            requestSent = true;
+        } else if (opponent==null){
+            opponent = GPSHandler.getEntityByGPS(position);
         }
-        if (handler!=null && handler.isGotObject())
-            opponent = new Entity(handler.getEntityObject(),true);
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
@@ -69,7 +63,7 @@ public class StageScreen extends MenuScreen implements Net.HttpResponseListener{
             game.font.draw(game.batch,String.valueOf(stepsRequired),200,700);
         }
         if (opponent!=null){
-            game.font.draw(game.batch,opponent.getName(),200,300);
+            game.font.draw(game.batch,opponent.getName(),200,200);
         }
         for (Button button:buttons) {
             game.batch.draw(button.getImage(), button.x, button.y);
@@ -92,6 +86,7 @@ public class StageScreen extends MenuScreen implements Net.HttpResponseListener{
     public void handleHttpResponse(Net.HttpResponse httpResponse) {
         statusCode = httpResponse.getStatus().getStatusCode();
         result = new Gson().fromJson(httpResponse.getResultAsString(),Stage.class);
+
 
     }
 
@@ -121,7 +116,15 @@ public class StageScreen extends MenuScreen implements Net.HttpResponseListener{
                         }
                         break;
                     case "Search":
-
+                        if (opponent!=null){
+                            Gdx.app.postRunnable(new Runnable() {
+                                @Override
+                                public void run() {
+                                    game.setScreen(new BattleScreen(game,game.user.createEntity(),opponent));
+                                    dispose();
+                                }
+                            });
+                        }
                         break;
                     case "Main":
                         game.setScreen(new MainScreen(game));

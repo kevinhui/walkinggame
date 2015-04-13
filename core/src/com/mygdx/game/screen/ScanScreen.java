@@ -62,7 +62,7 @@ public class ScanScreen extends MenuScreen implements Net.HttpResponseListener {
             consumable = new Gson().fromJson(result, Consumable.class);
             game.user.use(consumable);
             game.update();
-//            new Parse().deleteRequest("Consumable",consumable.getObjectId());
+            new Parse().deleteRequest("Consumable",consumable.getObjectId());
         } else {
             message = "Invalid QR Code";
         }

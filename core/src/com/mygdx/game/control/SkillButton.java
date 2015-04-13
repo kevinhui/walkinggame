@@ -3,7 +3,7 @@ package com.mygdx.game.control;
 import com.mygdx.game.skill.Skill;
 
 
-public class SkillButton extends EllipseButton {
+public class SkillButton extends RectButton {
 
     private Skill skill;
 

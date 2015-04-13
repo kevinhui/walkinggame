@@ -26,7 +26,7 @@ public class ResultScreen extends ScreenAdapter implements InputProcessor {
             message = "Victory!";
         else
             message = "Defeat...";
-        confirmButton = new RectButton((camera.viewportWidth-160)/2,(camera.viewportHeight-60)/2-100,"button-160x60.png","button-160x60.png","button-160x60.png","OK");
+        confirmButton = new RectButton((camera.viewportWidth-160)/2,(camera.viewportHeight-60)/2-100,"button_OK160x60.png","button_OK160x60.png","button_OK160x60.png","OK");
     }
 
     @Override

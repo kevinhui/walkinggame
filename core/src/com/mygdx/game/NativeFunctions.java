@@ -2,7 +2,7 @@ package com.mygdx.game;
 
 public interface NativeFunctions {
     public String getMacAddress();
-    public boolean isWifiEnabled();
+    public boolean isNetworkEnabled();
     public void openScanReader();
     public String getQRreaderResult();
     public void resetQRreaderResult();

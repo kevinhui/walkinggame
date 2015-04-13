@@ -5,11 +5,9 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mygdx.game.NewPlayer;
 import com.mygdx.game.Parse;
 import com.mygdx.game.User;
@@ -34,7 +32,7 @@ public class LoadingScreen extends ScreenAdapter implements Net.HttpResponseList
     @Override
     public void show(){
         String macAddress = game.nativeFunctions.getMacAddress();
-        if (!game.nativeFunctions.isWifiEnabled()){
+        if (!game.nativeFunctions.isNetworkEnabled()){
             message = "Error: No Network Connectivity";
         } else if (macAddress != null){
             Parse parse = new Parse(this);

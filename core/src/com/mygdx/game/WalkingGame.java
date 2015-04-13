@@ -26,7 +26,7 @@ public class WalkingGame extends Game {
     }
 
     public void create() {
-        background = new Texture("background.png");
+        background = new Texture("background.jpg");
         batch = new SpriteBatch();
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("hurry up.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -43,7 +43,8 @@ public class WalkingGame extends Game {
     }
 
     public void dispose(){
-        update();
+        if (user!=null)
+            update();
         batch.dispose();
         font.dispose();
         background.dispose();

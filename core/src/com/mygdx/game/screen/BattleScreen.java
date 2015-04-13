@@ -93,7 +93,7 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
 
         healthBar = new Texture(Gdx.files.internal("Health.png"));
         healthBg = new Texture("Health_bg.png");
-        battleBg = new Texture("battle_bg.png");
+        battleBg = new Texture("newbattlebg480x800.jpg");
 
         selfStateTime = 0;
         opponentStateTime = 0;
@@ -127,7 +127,7 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
 
-        game.batch.draw(battleBg,0,0,0,190,480,800);
+        game.batch.draw(battleBg,0,0);
         game.batch.draw(game.background,0,0,0,10,480,340);
 
        for (Button button:buttons) {

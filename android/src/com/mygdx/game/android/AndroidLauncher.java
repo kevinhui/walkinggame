@@ -1,8 +1,5 @@
 package com.mygdx.game.android;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,41 +7,34 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.Settings;
 import android.view.ContextThemeWrapper;
-import android.view.WindowManager;
 
+import com.badlogic.gdx.backends.android.AndroidApplication;
+import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
-import com.badlogic.gdx.backends.android.AndroidApplication;
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.mygdx.game.NativeFunctions;
 import com.mygdx.game.WalkingGame;
 
-public class AndroidLauncher extends AndroidApplication implements NativeFunctions, ConnectionCallbacks, OnConnectionFailedListener, SensorEventListener{
+public class AndroidLauncher extends AndroidApplication implements NativeFunctions, ConnectionCallbacks, OnConnectionFailedListener, SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor mAccelerometerSensor;
     private float mLimit = 10;
-    private float mLastValues[] = new float[3*2];
+    private float mLastValues[] = new float[3 * 2];
     private float mScale[] = new float[2];
     private float mYOffset;
-    private float mLastDirections[] = new float[3*2];
-    private float mLastExtremes[][] = { new float[3*2], new float[3*2] };
-    private float mLastDiff[] = new float[3*2];
+    private float mLastDirections[] = new float[3 * 2];
+    private float mLastExtremes[][] = {new float[3 * 2], new float[3 * 2]};
+    private float mLastDiff[] = new float[3 * 2];
     private int mLastMatch = -1;
     private int stepCount = 0;
     private boolean stepCounterEnable = false;
@@ -56,7 +46,7 @@ public class AndroidLauncher extends AndroidApplication implements NativeFunctio
     private double lat;
 
     @Override
-    public void openScanReader(){
+    public void openScanReader() {
         QRreaderResult = null;
         final IntentIntegrator integrator = new IntentIntegrator(AndroidLauncher.this);
         handler.post(new Runnable() {
@@ -66,47 +56,51 @@ public class AndroidLauncher extends AndroidApplication implements NativeFunctio
             }
         });
     }
-    public void onActivityResult(int requestCode, int resultCode, Intent intent){
-        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode,resultCode,intent);
-        if (scanResult != null){
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (scanResult != null) {
             QRreaderResult = scanResult.getContents();
         }
     }
 
     @Override
-    public String getQRreaderResult(){return QRreaderResult;}
+    public String getQRreaderResult() {
+        return QRreaderResult;
+    }
 
     @Override
     public void resetQRreaderResult() {
         QRreaderResult = null;
     }
 
-	@Override
-	protected void onCreate (Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         int h = 480;
-        mYOffset = h*0.5f;
-        mScale[0] = - (h * 0.5f * (1.0f / (SensorManager.STANDARD_GRAVITY * 2)));
-        mScale[1] = - (h * 0.5f * (1.0f / (SensorManager.MAGNETIC_FIELD_EARTH_MAX)));
+        mYOffset = h * 0.5f;
+        mScale[0] = -(h * 0.5f * (1.0f / (SensorManager.STANDARD_GRAVITY * 2)));
+        mScale[1] = -(h * 0.5f * (1.0f / (SensorManager.MAGNETIC_FIELD_EARTH_MAX)));
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-		super.onCreate(savedInstanceState);
-		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		initialize(new WalkingGame(this), config);
-	}
+        super.onCreate(savedInstanceState);
+        AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+        initialize(new WalkingGame(this), config);
+    }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         //Step Counter Method
-        if(stepCounterEnable) {
-            boolean a = mSensorManager.registerListener(this, mAccelerometerSensor,SensorManager.SENSOR_DELAY_FASTEST);
+        if (stepCounterEnable) {
+            boolean a = mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_FASTEST);
         }
     }
-    protected void onDestroy(){
+
+    protected void onDestroy() {
         super.onDestroy();
         //Step Counter Method
-        if(stepCounterEnable) {
+        if (stepCounterEnable) {
             mSensorManager.unregisterListener(this, mAccelerometerSensor);
         }
     }
@@ -119,21 +113,22 @@ public class AndroidLauncher extends AndroidApplication implements NativeFunctio
     }
 
     @Override
-    public boolean isWifiEnabled() {
-        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+    public boolean isNetworkEnabled() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        if (networkInfo!= null && networkInfo.isConnected()){
-            return true;
-        } else{
-            return false;
-        }
+        NetworkInfo[] networkInfo = connectivityManager.getAllNetworkInfo();
+        if (networkInfo != null)
+            for (int i = 0; i < networkInfo.length; i++)
+                if (networkInfo[i].getState() == NetworkInfo.State.CONNECTED) {
+                    return true;
+                }
+        return false;
     }
 
     @Override
     public void onConnected(Bundle bundle) {
         location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (location!=null) {
+        if (location != null) {
             lat = location.getLatitude();
             lot = location.getLongitude();
         }
@@ -148,6 +143,7 @@ public class AndroidLauncher extends AndroidApplication implements NativeFunctio
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
     }
+
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -155,11 +151,14 @@ public class AndroidLauncher extends AndroidApplication implements NativeFunctio
                 .addApi(LocationServices.API)
                 .build();
     }
+
     @Override
-    public double[] getGeolocation(){
-        if(mGoogleApiClient==null){buildGoogleApiClient();}
+    public double[] getGeolocation() {
+        if (mGoogleApiClient == null) {
+            buildGoogleApiClient();
+        }
         mGoogleApiClient.connect();
-        return new double[]{lat,lot};
+        return new double[]{lat, lot};
     }
 
     @Override
@@ -226,20 +225,15 @@ public class AndroidLauncher extends AndroidApplication implements NativeFunctio
     }
 
     @Override
-    public void enableStepCounter(){
+    public void enableStepCounter() {
         stepCounterEnable = true;
-        boolean a = mSensorManager.registerListener(this, mAccelerometerSensor,SensorManager.SENSOR_DELAY_FASTEST);
+        boolean a = mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @Override
-    public void disableStepCounter(){
+    public void disableStepCounter() {
         stepCounterEnable = false;
         mSensorManager.unregisterListener(this, mAccelerometerSensor);
     }
-
-    //Background Step Counter Method
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        mSensorManager.registerListener(this, mAccelerometerSensor,SensorManager.SENSOR_DELAY_FASTEST);
-        return Service.START_STICKY;
-    }
 }
+
