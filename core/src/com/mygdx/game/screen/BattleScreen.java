@@ -92,9 +92,9 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         firstPos = camera.viewportWidth;
         speed = 100;
 
-        healthBar = new Texture(Gdx.files.internal("Health.png"));
-        healthBg = new Texture("Health_bg.png");
-        battleBg = new Texture("battle_bg.png");
+        healthBar = new Texture(Gdx.files.internal("newhealthbar480x30.png"));
+        healthBg = new Texture("newhealthbartransparent480x30.png");
+        battleBg = new Texture("newbattlebg480x800.jpg");
         bg = new Texture("background.jpg");
 
         selfStateTime = 0;
@@ -147,7 +147,7 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         drawCharacter(delta);
 //        game.batch.draw(healthBar, 0, 240, camera.viewportWidth * self.getHealthPercentage(), 30);
         game.batch.draw(healthBg,0,240);
-        game.batch.draw(healthBar, 0, 240,0,0, (int) (camera.viewportWidth * self.getHealthPercentage()), 30);
+        game.batch.draw(healthBar, 0, 240,0,0, 75 + (int) ((camera.viewportWidth-75) * self.getHealthPercentage()), 30);
         game.font.draw(game.batch,self.getName(),0,500);
         game.font.draw(game.batch,opponent.getName(),camera.viewportWidth-game.font.getBounds(opponent.getName()).width,500);
         game.batch.end();
@@ -262,9 +262,11 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
                             }
                         },opponentAnimation[opponent.getCurrentState()].getAnimationDuration());
                     }
-                } else if (select.onRelease().charAt(0) == sequence[this.pointer]) {
+                } else if (select.onRelease().charAt(0) == sequence[this.pointer]&&firstPos<camera.viewportWidth) {
                     self.addEnergy(self.getConcentration());
                     forward();
+                } else if (select.onRelease().charAt(0)!= sequence[this.pointer]){
+                    self.dealRealDamage(5);
                 }
         }
         return true;

@@ -48,10 +48,8 @@ public class LoadingScreen extends ScreenAdapter implements Net.HttpResponseList
             JsonArray results = jobj.getAsJsonArray("results");
 //            Gdx.app.log("RESTTEST", String.valueOf(jobj.getAsJsonArray("results").toString()));
             if (results.size()==0){
-                NewPlayer newPlayer = new NewPlayer(game);
+                NewPlayer newPlayer = new NewPlayer(game,this);
                 Gdx.input.getTextInput(newPlayer, "Register", "", "Username");
-                game.setScreen(new MainScreen(game));
-                dispose();
             } else{
                 game.user = new Gson().fromJson(results.get(0),User.class);
                 game.setScreen(new MainScreen(game));

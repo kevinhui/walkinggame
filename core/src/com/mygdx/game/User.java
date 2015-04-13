@@ -30,11 +30,11 @@ public class User {
         this.userID = userID;
         Steps = 0;
         basehealth = 100;
-        strength = 20;
+        strength = 25;
         toughness = 10;
-        concentration = 2;
+        concentration = 5;
         stage = new Stage("ATEI6xiisE");
-        spriteSheet = "horny sprite.png";
+        spriteSheet = "chricky spritnew.png";
     }
     public User(){}
     public Stage getStage() {

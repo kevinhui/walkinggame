@@ -137,6 +137,9 @@ public class Entity {
                 currenthealth = currenthealth - (strength - toughness / 3);
         }
     }
+    public void dealRealDamage(int strength) {
+        currenthealth -= strength;
+    }
 
     public void defend(float second) {
         defending = true;
