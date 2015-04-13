@@ -100,6 +100,10 @@ public class Entity {
         this.isAI = isAI;
     }
 
+    public int getBasehealth() {
+        return basehealth;
+    }
+
     public String getName() {
         return name;
     }

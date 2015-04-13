@@ -42,6 +42,10 @@ public abstract class Button {
         current = enable ? active : inactive;
     }
 
+    public void setActive(Texture active){
+        this.active = active;
+    }
+
     public abstract boolean isClicked(float x,float y);
 
 }

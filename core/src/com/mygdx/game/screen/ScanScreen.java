@@ -47,7 +47,15 @@ public class ScanScreen extends MenuScreen implements Net.HttpResponseListener {
         }
         if (consumable!=null){
             consumableIcon = new Texture(consumable.getImagePath());
-            game.batch.draw(consumableIcon,(camera.viewportWidth-consumableIcon.getWidth())/2,300);
+            game.batch.draw(consumableIcon,(camera.viewportWidth-consumableIcon.getWidth())/2,600);
+            game.font.draw(game.batch,"Health",30,600);
+            game.font.draw(game.batch,"Strength",250,600);
+            game.font.draw(game.batch,"Defence",30,300);
+            game.font.draw(game.batch,"Spirit",250,300);
+            game.font.draw(game.batch,String.valueOf(consumable.getBasehealth()),30,500);
+            game.font.draw(game.batch,String.valueOf(consumable.getStrength()),250,500);
+            game.font.draw(game.batch,String.valueOf(consumable.getToughness()),30,200);
+            game.font.draw(game.batch,String.valueOf(consumable.getConcentration()),250,200);
         } else {
             game.font.draw(game.batch, message, (camera.viewportWidth- game.font.getBounds(message).width)/2,(camera.viewportHeight-game.font.getBounds(message).height)/2);
         }

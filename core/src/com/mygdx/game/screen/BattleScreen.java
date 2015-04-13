@@ -23,6 +23,7 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
     final int ONGOING = 0;
     final int VICTORY = 1;
     final int DEFEAT = 2;
+    private Texture bg;
     int gameState;
 
     final WalkingGame game;
@@ -93,7 +94,8 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
 
         healthBar = new Texture(Gdx.files.internal("Health.png"));
         healthBg = new Texture("Health_bg.png");
-        battleBg = new Texture("newbattlebg480x800.jpg");
+        battleBg = new Texture("battle_bg.png");
+        bg = new Texture("background.jpg");
 
         selfStateTime = 0;
         opponentStateTime = 0;
@@ -127,8 +129,8 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
 
-        game.batch.draw(battleBg,0,0);
-        game.batch.draw(game.background,0,0,0,10,480,340);
+        game.batch.draw(battleBg,0,0,0,190,480,800);
+        game.batch.draw(bg,0,0,0,10,480,340);
 
        for (Button button:buttons) {
            game.batch.draw(button.getImage(), button.x, button.y);
@@ -146,7 +148,8 @@ public class BattleScreen extends ScreenAdapter implements InputProcessor {
 //        game.batch.draw(healthBar, 0, 240, camera.viewportWidth * self.getHealthPercentage(), 30);
         game.batch.draw(healthBg,0,240);
         game.batch.draw(healthBar, 0, 240,0,0, (int) (camera.viewportWidth * self.getHealthPercentage()), 30);
-
+        game.font.draw(game.batch,self.getName(),0,500);
+        game.font.draw(game.batch,opponent.getName(),camera.viewportWidth-game.font.getBounds(opponent.getName()).width,500);
         game.batch.end();
 
 //        if (Gdx.input.isTouched()){

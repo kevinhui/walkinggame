@@ -3,6 +3,7 @@ package com.mygdx.game.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 import com.google.gson.Gson;
 import com.mygdx.game.Entity;
@@ -27,8 +28,8 @@ public class StageScreen extends MenuScreen implements Net.HttpResponseListener{
     public StageScreen(WalkingGame game) {
         super(game);
         new Parse(this).getRequestByIdContent("Stage",game.user.getStage().getObjectId(),"include=Entity");
-        startButton = new RectButton(200,500,"button_START160x60.png","button_START160x60.png","button_START160x60.png","Start");
-        searchButton = new RectButton(200,300,"button_START160x60.png","button_START160x60.png","button_START160x60.png","Search");
+        startButton = new RectButton(160,500,"button_START160x60.png","button_START160x60.png","button_START160x60.png","Start");
+        searchButton = new RectButton(160,250,"button_START160x60.png","button_START160x60.png","button_START160x60.png","Search");
         buttons.add(startButton);
         buttons.add(searchButton);
         started = false;
@@ -59,11 +60,11 @@ public class StageScreen extends MenuScreen implements Net.HttpResponseListener{
                 game.nativeFunctions.disableStepCounter();
                 dispose();
             }
-            game.font.draw(game.batch, temp.getEntityname(), 200, 600);
-            game.font.draw(game.batch,String.valueOf(stepsRequired),200,700);
+            game.font.draw(game.batch, temp.getEntityname(), (camera.viewportWidth-game.font.getBounds(temp.getEntityname()).width)/2, 640);
+            game.font.draw(game.batch,"Steps:"+String.valueOf(stepsRequired),(camera.viewportWidth-game.font.getBounds("Steps"+String.valueOf(stepsRequired)).width)/2,700);
         }
         if (opponent!=null){
-            game.font.draw(game.batch,opponent.getName(),200,200);
+            game.font.draw(game.batch,opponent.getName(),(camera.viewportWidth-game.font.getBounds(opponent.getName()).width)/2,350);
         }
         for (Button button:buttons) {
             game.batch.draw(button.getImage(), button.x, button.y);
@@ -110,9 +111,11 @@ public class StageScreen extends MenuScreen implements Net.HttpResponseListener{
                         if (!started) {
                             game.nativeFunctions.enableStepCounter();
                             started = true;
+                            select.setActive(new Texture("button_STOP160x60.png"));
                         } else{
                             game.nativeFunctions.disableStepCounter();
                             started = false;
+                            select.setActive(new Texture("button_START160x60.png"));
                         }
                         break;
                     case "Search":
@@ -120,7 +123,7 @@ public class StageScreen extends MenuScreen implements Net.HttpResponseListener{
                             Gdx.app.postRunnable(new Runnable() {
                                 @Override
                                 public void run() {
-                                    game.setScreen(new BattleScreen(game,game.user.createEntity(),opponent));
+                                    game.setScreen(new BattleScreen(game, game.user.createEntity(), opponent));
                                     dispose();
                                 }
                             });

@@ -26,7 +26,7 @@ public class WalkingGame extends Game {
     }
 
     public void create() {
-        background = new Texture("background.jpg");
+        background = new Texture("background480x800.png");
         batch = new SpriteBatch();
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("hurry up.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
