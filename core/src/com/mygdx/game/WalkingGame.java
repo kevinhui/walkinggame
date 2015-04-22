@@ -2,16 +2,13 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.google.gson.Gson;
 import com.mygdx.game.screen.LoadingScreen;
-import com.mygdx.game.screen.ResultScreen;
-import com.mygdx.game.screen.ScanScreen;
-import com.mygdx.game.screen.TestScreen;
+
 
 public class WalkingGame extends Game {
     public SpriteBatch batch;

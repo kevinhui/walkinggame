@@ -1,6 +1,5 @@
 package com.mygdx.game.android;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -235,5 +234,7 @@ public class AndroidLauncher extends AndroidApplication implements NativeFunctio
         stepCounterEnable = false;
         mSensorManager.unregisterListener(this, mAccelerometerSensor);
     }
+
+
 }
 
